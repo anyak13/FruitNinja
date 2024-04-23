@@ -24,4 +24,8 @@ public class Fruit {
     public void move() {
 
     }
+
+    public Image getFruitImage() {
+        return fruitImage;
+    }
 }

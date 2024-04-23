@@ -28,5 +28,6 @@ public class FruitNinja implements ActionListener {
     public void actionPerformed(ActionEvent e) {
     }
     public static void main(String[] args) {
+        FruitNinja game = new FruitNinja();
     }
 }
