@@ -6,12 +6,12 @@ public class Fruit {
     private String fruitType;
     private int x, flyHeight;
     private static final int y = -15;
-    private static final int FRUIT_WIDTH = 30;
-    private static final int FRUIT_LENGTH = 30;
+    private static final int FRUIT_WIDTH = 175;
+    private static final int FRUIT_LENGTH = 175;
     private Image fruitImage;
     private boolean isSliced;
     private FruitNinjaView window;
-    public Fruit(String fruitType, int x, int flyHeight, Image fruitImage) {
+    public Fruit(String fruitType, Image fruitImage) {
         x = (int)(Math.random() * 600);
         flyHeight = (int)(Math.random() * 800);
         this.fruitType = fruitType;
