@@ -5,41 +5,39 @@ import java.util.ArrayList;
 
 // Anya Kothari
 // 4/20/24
-public class FruitNinjaView extends JFrame implements MouseListener, MouseMotionListener, ActionListener {
+public class FruitNinjaView extends JFrame implements MouseListener, MouseMotionListener {
     private FruitNinja game;
     public static final int WINDOW_WIDTH = 600;
     public static final int WINDOW_HEIGHT = 800;
-    private ArrayList<Fruit> fruitImages;
     private Image bombImage;
-    private Image BG;
-    public static final int WELCOME = 0;
-    public static final int GAME = 1;
-    public static final int FRUIT_CLICKED = 2;
-    private static int state = WELCOME;
+    private Image startBG;
+    private Image instructions;
+    private Image gameBG;
+    private Image gameOverBG;
+    private Image readyBG;
+    private Image goBG;
+    private Image playBG;
     private Image gameName;
+    private Image x;
+    private Image redX;
+    private static final int DISTANCE_BETWEEN_X = 60;
+    private static final int X_START_X_VALUE = 350;
+    private static final int X_Y_Value = 50;
 
     public FruitNinjaView(FruitNinja game) {
         this.game = game;
-        fruitImages = new ArrayList<Fruit>();
-        fruitImages.add(new Fruit("Watermelon", new ImageIcon("Resources/watermelon.png").getImage()));
-        fruitImages.add(new Fruit("Banana", new ImageIcon("Resources/banana.png").getImage()));
-        fruitImages.add(new Fruit("Pineapple", new ImageIcon("Resources/pineapple.png").getImage()));
-        fruitImages.add(new Fruit("Coconut", new ImageIcon("Resources/coconut.png").getImage()));
-        fruitImages.add(new Fruit("Red Apple", new ImageIcon("Resources/red apple.png").getImage()));
-        fruitImages.add(new Fruit("Green Apple", new ImageIcon("Resources/green apple.png").getImage()));
-        fruitImages.add(new Fruit("Lemon", new ImageIcon("Resources/lemon.png").getImage()));
-        fruitImages.add(new Fruit("Orange", new ImageIcon("Resources/orange.png").getImage()));
-        fruitImages.add(new Fruit("Lime", new ImageIcon("Resources/lime.png").getImage()));
-        fruitImages.add(new Fruit("Passion Fruit", new ImageIcon("Resources/passion fruit.png").getImage()));
-        fruitImages.add(new Fruit("Pear", new ImageIcon("Resources/pear.png").getImage()));
-        fruitImages.add(new Fruit("Strawberry", new ImageIcon("Resources/strawberry.png").getImage()));
-        fruitImages.add(new Fruit("Mango", new ImageIcon("Resources/mango.png").getImage()));
 
         //bombImage = new ImageIcon("").getImage();
 
         // Initialze background images
-        BG = new ImageIcon("Resources/BG.jpg").getImage();
-        gameName = new ImageIcon("Resources/name.png").getImage();
+        startBG = new ImageIcon("Resources/startBG.jpg").getImage();
+        instructions = new ImageIcon("Resources/instructions.jpg").getImage();
+        gameOverBG = new ImageIcon("Resources/gameOverBG.png").getImage();
+        readyBG = new ImageIcon("Resources/ready.png").getImage();
+        goBG = new ImageIcon("Resources/go.jpg").getImage();
+        playBG = new ImageIcon("Resources/playBG.png").getImage();
+        x = new ImageIcon("Resources/X.png").getImage();
+        redX = new ImageIcon("Resources/redX.png").getImage();
 
         this.addMouseListener(this);
         this.addMouseMotionListener(this);
@@ -52,49 +50,105 @@ public class FruitNinjaView extends JFrame implements MouseListener, MouseMotion
     }
 
     public void paint(Graphics g) {
-        if (state == WELCOME) {
+        System.out.println("in paint with game state of: " + game.getState());
+        if (game.getState() == game.WELCOME) {
             drawWelcomeScreen(g);
         }
-        if (state == GAME) {
+        if (game.getState() == game.INSTRUCTIONS) {
+            System.out.println("in paint for instrutions state");
+            //drawInstructionScreen(g);
+            g.drawImage(instructions, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, this);
+        }
+        if (game.getState() == game.STARTING) {
+            drawStartGameScreen(g);
+        }
+        if (game.getState() == game.GAME) {
             drawGameScreen(g);
         }
-        if (state == FRUIT_CLICKED) {
+        if (game.getState() == game.FRUIT_CLICKED) {
             removeFruit(g);
+        }
+        if (game.getState() == game.GAME_OVER) {
+            drawGameOverScreen(g);
+        }
+        if (game.getState() == game.MADE_MISTAKE) {
+            showMistake(g);
         }
     }
 
     public void drawWelcomeScreen(Graphics g) {
-        g.drawImage(BG, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, this);
-        g.drawImage(gameName, 125, 75, 350, 215,this);
-        g.setFont(new Font("Serif", Font.BOLD, 25));
-        g.setColor(Color.black);
-        g.drawString("Instructions", 50, 325);
+        g.drawImage(startBG, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, this);
     }
-
+    public void drawInstructionScreen(Graphics g) {
+        g.drawImage(instructions, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, this);
+    }
     public void drawGameScreen(Graphics g) {
-        g.drawImage(BG, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, this);
-        g.setFont(new Font("Serif", Font.BOLD, 50));
+        g.drawImage(playBG, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, this);
+        for (int i = 0; i < game.getFruits().size(); i++) {
+            game.getFruits().get(i).draw(g);
+        }
+        int numX = 3;
+        for (int i = 0; i < numX; i ++) {
+            g.drawImage(x, X_START_X_VALUE + (DISTANCE_BETWEEN_X * (i + 1)), X_Y_Value, 60, 90,this);
+        }
+        g.setFont(new Font("Serif", Font.BOLD, 25));
         g.setColor(Color.white);
-        g.drawString("Score", 50, 100);
-        fruitImages.get(0).draw(g);
-
+        //g.drawString(game.getScore(), 50, 50);
     }
     public void removeFruit(Graphics g) {
-        g.drawImage(BG, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, this);
+        g.drawImage(startBG, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, this);
     }
-//    //@Override
-//    public void mouseClicked(MouseEvent mouseEvent, Graphics g) {
-//        state = FRUIT_CLICKED;
-//        removeFruit(Graphics g);
-//        repaint();
-//    }
+
+    public void drawGameOverScreen(Graphics g) {
+        g.drawImage(gameOverBG, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, this);
+//        g.setFont(new Font("Serif", Font.BOLD, 25));
+//        g.setColor(Color.white);
+        g.drawString(game.getScore(), 50, 50);
+    }
+    public void drawStartGameScreen(Graphics g) {
+        g.drawImage(readyBG, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, this);
+        //wait(100);
+        g.drawImage(goBG, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, this);
+        //wait(100);
+        drawGameScreen(g);
+    }
+
+    public void showMistake(Graphics g) {
+        if (game.getNumMistakes() == 1) {
+            g.drawImage(redX, X_START_X_VALUE, X_Y_Value, 60, 90,this);
+        }
+        if (game.getNumMistakes() == 2) {
+            g.drawImage(redX, X_START_X_VALUE + DISTANCE_BETWEEN_X, X_Y_Value, 60, 90,this);
+        }
+        g.drawImage(redX, X_START_X_VALUE + (DISTANCE_BETWEEN_X * 2), X_Y_Value, 60, 90,this);
+        drawGameOverScreen(g);
+    }
 
     @Override
     public void mouseClicked(MouseEvent mouseEvent) {
-        if (state == GAME) {
-            state = FRUIT_CLICKED;
+        if (game.getState() == game.WELCOME) {
+            System.out.println("in welcome state");
+            game.setState(game.INSTRUCTIONS);
+            System.out.println(game.getState());
+            repaint();
+            //System.out.println("hi");
         }
-        repaint();
+        if (game.getState() == game.INSTRUCTIONS) {
+            System.out.println("in instructions state");
+            game.setState(game.STARTING);
+            repaint();
+        }
+        if (game.getState() == game.STARTING) {
+            System.out.println("in starting state");
+            game.setState(game.GAME);
+            //repaint();
+        }
+        if (game.getState() == game.GAME) {
+            //if(fruitImages.get(0).getX()) {
+            game.setState(game.FRUIT_CLICKED);
+            //repaint();
+        }
+        this.repaint();
     }
 
     @Override
@@ -124,11 +178,6 @@ public class FruitNinjaView extends JFrame implements MouseListener, MouseMotion
 
     @Override
     public void mouseMoved(MouseEvent mouseEvent) {
-
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent actionEvent) {
 
     }
 }
