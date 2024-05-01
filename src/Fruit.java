@@ -3,39 +3,60 @@
 import java.awt.*;
 
 public class Fruit {
-    private String fruitType;
-    private int x, y, dx, dy, flyHeight;
+    //private String fruitType;
+    private int x;
+    private int y;
+    private int dx;
+    private int dy;
+    private int width;
+    private int height;
+    private int flyHeight;
     //private static final int startingY = -15;
-    private static final int FRUIT_WIDTH = 175;
-    private static final int FRUIT_LENGTH = 175;
+    public static final int FRUIT_WIDTH = 175;
+    public static final int FRUIT_HEIGHT = 175;
     private Image fruitImage;
     private boolean isSliced;
     private boolean movingUp;
+    private boolean movingRight;
     private FruitNinjaView window;
     private static final int STARTING_Y = 800;
-    public Fruit(String fruitType, Image fruitImage, int x, int y, int dx, int dy, int flyHeight, boolean movingUp) {
-//        x = (int)(Math.random() * 600);
-//        flyHeight = (int)(Math.random() * 800);
-////        this.dx = dx;
-////        this.dy = dy;
+    private static final int DX_DY = 8;
+//    public Fruit(Image fruitImage, int width, int height, int x, int y, int dx, int dy, int flyHeight) {
+////        x = (int)(Math.random() * 600);
+////        flyHeight = (int)(Math.random() * 800);
+//////        this.dx = dx;
+//////        this.dy = dy;
+////        this.fruitType = fruitType;
+////        this.fruitImage = fruitImage;
 //        this.fruitType = fruitType;
 //        this.fruitImage = fruitImage;
-        this.fruitType = fruitType;
+//        this.x = x;
+//        this.y = y;
+//        this.width = width;
+//        this.height = height;
+//        this.dx= dx;
+//        this.dy = dy;
+//        //this.width = width;
+////        this.width = fruitImage.getWidth();
+////        this.height = fruitImage.getHeight();
+//        //this.height = height;
+//        this.flyHeight = flyHeight;
+//        this.movingUp = movingUp;
+//    }
+
+    public Fruit(Image fruitImage) {
+        x = (int)(Math.random() * 400) + 100;
+        y = STARTING_Y;
+        flyHeight = (int)((Math.random() * 200) + 100);
         this.fruitImage = fruitImage;
-        this.x = x;
-        this.y = y;
-        this.dx= dx;
-        this.dy = dy;
-        this.flyHeight = flyHeight;
-        this.movingUp = movingUp;
-    }
-
-    public Fruit(String fruitType, Image fruitImage) {
-        this(fruitType, fruitImage, (int)(Math.random() * 500), STARTING_Y, 6, 6, (int)((Math.random() * 200) + 100), true);
-    }
-
-    public String getFruitType() {
-        return fruitType;
+        this.width = FRUIT_WIDTH; //fruitImage.getWidth(null);
+        this.height = FRUIT_HEIGHT; //fruitImage.getHeight(null);
+        dx = DX_DY / 6;
+        dy = DX_DY;
+        movingUp = true;
+        if (x < 300) movingRight = true;
+        else movingRight = false;
+        //this(fruitType, fruitImage, (int)(Math.random() * 500), STARTING_Y, 6, 6, (int)((Math.random() * 200) + 100), true);
     }
 
     public int getX() {
@@ -53,13 +74,15 @@ public class Fruit {
     public boolean isSliced() {
         return isSliced;
     }
+    public int getWidth() {
+        return width;
+    }
+    public int getHeight() {
+        return height;
+    }
 
     public FruitNinjaView getWindow() {
         return window;
-    }
-
-    public void setFruitType(String fruitType) {
-        this.fruitType = fruitType;
     }
 
     public void setX(int x) {
@@ -83,7 +106,7 @@ public class Fruit {
     }
 
     public void draw(Graphics g) {
-        g.drawImage(fruitImage, x, y, FRUIT_WIDTH, FRUIT_LENGTH, window);
+        g.drawImage(fruitImage, x, y, getWidth(), getHeight(), window);
     }
 
     public void move() {
@@ -92,10 +115,39 @@ public class Fruit {
             y -= dy;
         }
         y += dy;*/
+        //y -= dy;
+        //System.out.println("flyHeight position is: " + flyHeight);
+        //System.out.println("current y  position is: " + y);
+        //System.out.println("current x position is: " + x);
+        if (movingUp)
+        {
+            y -= dy;
+            if (y <= flyHeight) {
+                movingUp = false;
+            }
+        }
+        else {
+            y += dy;
+        }
+        if (movingRight)
+        {
+            x += dx;
+            //if (y <= flyHeight) movingUp = false;
+        }
+        else {
+            x -= dx;
+        }
+        //x-=dx;
+        /*
         if (y >= flyHeight) {
             y -= dy;
         }
-        else y += dy;
+        else if (y < flyHeight) {
+            y += dy;
+        }
+        */
+
+        //else y += dy;
     }
 
     public Image getFruitImage() {
