@@ -18,6 +18,7 @@ public class FruitNinjaView extends JFrame {
     private Image playBG;
     private Image x;
     private Image redX;
+    private Image bombBG;
     private static final int DISTANCE_BETWEEN_X = 60;
     private static final int X_START_X_VALUE = 400;
     private static final int X_Y_Value = 50;
@@ -28,14 +29,15 @@ public class FruitNinjaView extends JFrame {
         //bombImage = new ImageIcon("").getImage();
 
         // Initialize background images
-        startBG = new ImageIcon("Resources/startBG.jpg").getImage();
-        instructions = new ImageIcon("Resources/instructions.jpg").getImage();
+        startBG = new ImageIcon("Resources/startBG.png").getImage();
+        instructions = new ImageIcon("Resources/instructionBG.png").getImage();
         gameOverBG = new ImageIcon("Resources/gameOverBG.png").getImage();
-        readyBG = new ImageIcon("Resources/ready.png").getImage();
-        goBG = new ImageIcon("Resources/go.jpg").getImage();
+        readyBG = new ImageIcon("Resources/readyBG.png").getImage();
+        goBG = new ImageIcon("Resources/goBG.png").getImage();
         playBG = new ImageIcon("Resources/playBG.png").getImage();
         x = new ImageIcon("Resources/X.png").getImage();
         redX = new ImageIcon("Resources/redX.png").getImage();
+        bombBG = new ImageIcon("Resources/bombBG.jpg").getImage();
 
         // Set up the window
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -66,9 +68,10 @@ public class FruitNinjaView extends JFrame {
         if (game.getState() == game.GAME_OVER) {
             drawGameOverScreen(g);
         }
-        if (game.getState() == game.MADE_MISTAKE) {
-            showMistake(g);
+        if (game.getState() == game.BOMB_CLICKED) {
+            drawBombScreen(g);
         }
+        showMistake(g);
     }
 
     public void drawWelcomeScreen(Graphics g) {
@@ -102,7 +105,7 @@ public class FruitNinjaView extends JFrame {
     }
 
     public void drawFruits(Graphics g) {
-        game.getFruits().get(0).draw(g);
+        game.getFruits().getFirst().draw(g);
 //        for (Fruit fruit : game.getFruits()) {
 //            fruit.move();
 //            Fruit currFruit = fruit;
@@ -128,15 +131,20 @@ public class FruitNinjaView extends JFrame {
     }
 
     public void showMistake(Graphics g) {
-        if (game.getNumMistakes() == 1) {
+        if (game.getNumMistakes() >= 1) {
             g.drawImage(redX, X_START_X_VALUE - 2, X_Y_Value + 1, 60, 65,this);
         }
-        if (game.getNumMistakes() == 2) {
+        if (game.getNumMistakes() >= 2) {
             g.drawImage(redX, X_START_X_VALUE + DISTANCE_BETWEEN_X, X_Y_Value, 60, 65,this);
         }
-        if (game.getNumMistakes() == 3) {
+        if (game.getNumMistakes() >= 3) {
             g.drawImage(redX, X_START_X_VALUE + (DISTANCE_BETWEEN_X * 2), X_Y_Value, 60, 65,this);
             //drawGameOverScreen(g);
         }
+    }
+
+    public void drawBombScreen(Graphics g) {
+        g.drawImage(bombBG, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, this);
+        //drawGameScreen(g);
     }
 }

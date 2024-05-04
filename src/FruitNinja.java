@@ -24,9 +24,12 @@ public class FruitNinja implements ActionListener, MouseListener, MouseMotionLis
     public static final int FRUIT_CLICKED = 4;
     public static final int GAME_OVER = 5;
     public static final int MADE_MISTAKE = 6;
+    public static final int BOMB_CLICKED = 7;
+    public static final int SLICED = 8;
     private static int state = WELCOME;
     public static final int DELAY_IN_MILLISEC = 20;
-    private static int FRUIT_TYPES = 13;
+    private static final int SLICED_IMAGE_INDEX = 1;
+    private int count;
     public FruitNinja() {
         this.window = new FruitNinjaView(this);
         gameOver = false;
@@ -35,11 +38,11 @@ public class FruitNinja implements ActionListener, MouseListener, MouseMotionLis
 
         //fruits = new Fruit[FRUIT_TYPES];
         fruits = new ArrayList<Fruit>();
-        fruits.add(new Fruit(new ImageIcon("Resources/fruit1.png").getImage()));
+        int numFirstFruit = (int)((Math.random() * 13) + 1);
+        fruits.add(new Fruit(new ImageIcon("Resources/fruit" + numFirstFruit + ".png").getImage()));
 //        for (int i = 0; i < FRUIT_TYPES; i++) {
 //            fruits[i] = new Fruit(new ImageIcon("Resources/fruit" + (i + 1) + ".png").getImage());
 //        }
-
         Timer clock = new Timer(DELAY_IN_MILLISEC, this);
         clock.start();
 
@@ -58,15 +61,48 @@ public class FruitNinja implements ActionListener, MouseListener, MouseMotionLis
 //        System.out.println("mouse click x position: " + mouseX);
 //        System.out.println("current fruit x position: " + fruits.get(0).getX());
         //if (((mouseX - fruits[0].getX() < 100) && (mouseX - fruits[0].getX() >= 0)) || ((fruits[0].getX() - mouseX < 100) && (fruits[0].getX() - mouseX >= 0)))
-        if (mouseX >= fruits.get(0).getX() && mouseX <= (fruits.get(0).getX() + fruits.get(0).getWidth()) && mouseY >= fruits.get(0).getY() && mouseY <= fruits.get(0).getY() + fruits.get(0).getHeight()) {
-            updateScore();
-            state = FRUIT_CLICKED;
-            window.repaint();
+        //if (fruits.getFirst().equals(bomb))
+        if (mouseX >= fruits.getFirst().getX() && mouseX <= (fruits.getFirst().getX() + fruits.getFirst().getWidth()) && mouseY >= fruits.getFirst().getY() && mouseY <= fruits.getFirst().getY() + fruits.getFirst().getHeight()) {
+            if (!fruits.getFirst().isBomb) {
+                updateScore();
+                //state = FRUIT_CLICKED;
+
+                // update image for sliced effect
+                fruits.getFirst().setFruitImage(new ImageIcon("Resources/fruit1Sliced.png").getImage());
+                fruits.getFirst().setSliced(true);
+
+
+                //addObject();
+                //fruits.remove(fruits.getFirst());
+                window.repaint();
+            }
+            // in this case bomb was clicked
+            else {
+                state = BOMB_CLICKED;
+                numMistakes = 0;
+                window.repaint();
+            }
         }
     }
 
     public void addRandomFruit() {
-        fruits.add(new Fruit(new ImageIcon("Resources/fruit" + (int)(Math.random() * 13) + ".png").getImage()));
+        fruits.add(new Fruit(new ImageIcon("Resources/fruit" + (int)((Math.random() * 13) + 1) + ".png").getImage()));
+    }
+
+    public void addBomb() {
+        fruits.add(new Bomb(new ImageIcon("Resources/bomb.png").getImage()));
+    }
+
+    public void addObject() {
+        int randomInt = (int)(Math.random() * 6);
+        if (randomInt < 5) {
+            addRandomFruit();
+            //fruits.add(new Fruit(new ImageIcon("Resources/fruit" + (int)((Math.random() * 13) + 1) + ".png").getImage()));
+        }
+        else {
+            addBomb();
+            //fruits.add(new Fruit(new ImageIcon("Resources/bomb.png").getImage()));
+        }
     }
 
     public int getState() {
@@ -101,26 +137,50 @@ public class FruitNinja implements ActionListener, MouseListener, MouseMotionLis
         this.numMistakes = numMistakes;
     }
 
+//    public void checkIfFallen(Fruit currentFruit) {
+//        if (currentFruit.getY() > window.WINDOW_HEIGHT) {
+//            numMistakes++;
+//            state = MADE_MISTAKE;
+//        }
+//    }
+
+//    public void drawNextFruit(Fruit currentFruit) {
+//        fruits.remove(currentFruit);
+//        addRandomFruit();
+//        state = GAME;
+//    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
 //        for (Fruit fruit : fruits) {
 //            fruit.move();
 //        }
         //System.out.println("about to call move in actionPerformed");
-        if (state == GAME)
-        {
+        if (state == GAME) {
             for (Fruit fruit : fruits) {
                 fruit.move();
+//                checkIfFallen(fruit);
+//                drawNextFruit(fruit);
                 if (fruit.getY() > window.WINDOW_HEIGHT) {
-                    numMistakes++;
-                    state = MADE_MISTAKE;
+                    System.out.println("Before " + numMistakes);
+                    if (!(fruit.isBomb || fruit.isSliced())) {
+                        numMistakes++;
+                    }
+                    //System.out.println(numMistakes);
+                    //System.out.println(fruit.getY());
+                    addObject();
                     fruits.remove(fruit);
-                    addRandomFruit();
-                }
 
+                    //state = MADE_MISTAKE;
+                    //addRandomFruit();
+                    //addBomb();
+                    state = GAME;
+                }
+                window.repaint();
             }
-            window.repaint();
-            checkGameOver();
+        }
+            //window.repaint();
+        checkGameOver();
             //fruits.get(0).move();
 //            if (fruits.get(0).getY() > 800) {
 //                numMistakes++;
@@ -128,9 +188,14 @@ public class FruitNinja implements ActionListener, MouseListener, MouseMotionLis
 //                checkGameOver();
 //            }
 //            window.repaint();
-        }
         //fruits.get(0).move();
-
+//        if (state == BOMB_CLICKED)
+//        {
+//            window.repaint();
+//            setGameOver(true);
+//            state = GAME_OVER;
+//            window.repaint();
+//        }
     }
 
     public void setGameOver(boolean gameOver) {
@@ -171,15 +236,15 @@ public class FruitNinja implements ActionListener, MouseListener, MouseMotionLis
             setState(GAME);
             //repaint();
         }
-        else if (state == GAME) {
-            //if(fruitImages.get(0).getX()) {
-            //setState(FRUIT_CLICKED);
-            int xClicked= e.getX();
-            int yClicked= e.getY();
-            System.out.println(xClicked);
-            fruitClicked(xClicked, yClicked);
-            //repaint();
-        }
+//        else if (state == GAME) {
+//            //if(fruitImages.get(0).getX()) {
+//            //setState(FRUIT_CLICKED);
+//            int xClicked= e.getX();
+//            int yClicked= e.getY();
+//            System.out.println(xClicked);
+//            fruitClicked(xClicked, yClicked);
+//            //repaint();
+//        }
         window.repaint();
     }
 
@@ -204,8 +269,16 @@ public class FruitNinja implements ActionListener, MouseListener, MouseMotionLis
     }
 
     @Override
-    public void mouseDragged(MouseEvent mouseEvent) {
-
+    public void mouseDragged(MouseEvent e) {
+        if (state == GAME) {
+            //if(fruitImages.get(0).getX()) {
+            //setState(FRUIT_CLICKED);
+            int xClicked = e.getX();
+            int yClicked = e.getY();
+            System.out.println(xClicked);
+            fruitClicked(xClicked, yClicked);
+            //repaint();
+        }
     }
 
     @Override
@@ -216,6 +289,7 @@ public class FruitNinja implements ActionListener, MouseListener, MouseMotionLis
         FruitNinja game = new FruitNinja();
        // game.playGame();
     }
+}
 
 
     // Run repaint() to draw and run the front-end
@@ -223,7 +297,6 @@ public class FruitNinja implements ActionListener, MouseListener, MouseMotionLis
     {
         window.repaint();
     }*/
-}
 
 
 //}
