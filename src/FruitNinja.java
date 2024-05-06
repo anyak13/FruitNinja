@@ -25,7 +25,6 @@ public class FruitNinja implements ActionListener, MouseListener, MouseMotionLis
     public static final int GAME_OVER = 5;
     public static final int MADE_MISTAKE = 6;
     public static final int BOMB_CLICKED = 7;
-    public static final int SLICED = 8;
     private static int state = WELCOME;
     public static final int DELAY_IN_MILLISEC = 20;
     private static final int SLICED_IMAGE_INDEX = 1;
@@ -38,8 +37,8 @@ public class FruitNinja implements ActionListener, MouseListener, MouseMotionLis
 
         //fruits = new Fruit[FRUIT_TYPES];
         fruits = new ArrayList<Fruit>();
-        int numFirstFruit = (int)((Math.random() * 13) + 1);
-        fruits.add(new Fruit(new ImageIcon("Resources/fruit" + numFirstFruit + ".png").getImage()));
+        int numFruit = (int)((Math.random() * 13) + 1);
+        fruits.add(new Fruit(new ImageIcon("Resources/fruit" + numFruit + ".png").getImage(), numFruit));
 //        for (int i = 0; i < FRUIT_TYPES; i++) {
 //            fruits[i] = new Fruit(new ImageIcon("Resources/fruit" + (i + 1) + ".png").getImage());
 //        }
@@ -64,11 +63,13 @@ public class FruitNinja implements ActionListener, MouseListener, MouseMotionLis
         //if (fruits.getFirst().equals(bomb))
         if (mouseX >= fruits.getFirst().getX() && mouseX <= (fruits.getFirst().getX() + fruits.getFirst().getWidth()) && mouseY >= fruits.getFirst().getY() && mouseY <= fruits.getFirst().getY() + fruits.getFirst().getHeight()) {
             if (!fruits.getFirst().isBomb) {
-                updateScore();
+                if (!fruits.getFirst().isSliced()) {
+                    updateScore();
+                }
                 //state = FRUIT_CLICKED;
 
                 // update image for sliced effect
-                fruits.getFirst().setFruitImage(new ImageIcon("Resources/fruit1Sliced.png").getImage());
+                fruits.getFirst().setFruitImage(new ImageIcon("Resources/fruit" + fruits.getFirst().getFruitNum() +"Sliced.png").getImage());
                 fruits.getFirst().setSliced(true);
 
 
@@ -86,11 +87,12 @@ public class FruitNinja implements ActionListener, MouseListener, MouseMotionLis
     }
 
     public void addRandomFruit() {
-        fruits.add(new Fruit(new ImageIcon("Resources/fruit" + (int)((Math.random() * 13) + 1) + ".png").getImage()));
+        int randomFruitNum = (int)((Math.random() * 13) + 1);
+        fruits.add(new Fruit(new ImageIcon("Resources/fruit" + randomFruitNum + ".png").getImage(), randomFruitNum));
     }
 
     public void addBomb() {
-        fruits.add(new Bomb(new ImageIcon("Resources/bomb.png").getImage()));
+        fruits.add(new Bomb(new ImageIcon("Resources/bomb.png").getImage(), 0));
     }
 
     public void addObject() {
@@ -166,6 +168,7 @@ public class FruitNinja implements ActionListener, MouseListener, MouseMotionLis
                     if (!(fruit.isBomb || fruit.isSliced())) {
                         numMistakes++;
                     }
+                    state = GAME;
                     //System.out.println(numMistakes);
                     //System.out.println(fruit.getY());
                     addObject();

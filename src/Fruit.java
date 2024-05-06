@@ -11,6 +11,7 @@ public class Fruit {
     private int width;
     private int height;
     private int flyHeight;
+    private int fruitNum;
     //private static final int startingY = -15;
     public static final int FRUIT_WIDTH = 200;
     public static final int FRUIT_HEIGHT = 190;
@@ -47,7 +48,7 @@ public class Fruit {
 //        this.movingUp = movingUp;
 //    }
 
-    public Fruit(Image fruitImage) {
+    public Fruit(Image fruitImage, int fruitNum) {
         x = (int)(Math.random() * 400) + 100;
         y = STARTING_Y;
         flyHeight = (int)((Math.random() * 200) + 100);
@@ -60,6 +61,8 @@ public class Fruit {
         if (x < 300) movingRight = true;
         else movingRight = false;
         isBomb = false;
+        this.fruitNum = fruitNum;
+        //fruitNum = (int)((Math.random() * 13) + 1);
         //this(fruitType, fruitImage, (int)(Math.random() * 500), STARTING_Y, 6, 6, (int)((Math.random() * 200) + 100), true);
     }
 
@@ -83,6 +86,14 @@ public class Fruit {
     }
     public int getHeight() {
         return height;
+    }
+
+    public int getFruitNum() {
+        return fruitNum;
+    }
+
+    public void setFruitNum(int fruitNum) {
+        this.fruitNum = fruitNum;
     }
 
     private void setBombStatus(boolean isBomb)
@@ -163,4 +174,5 @@ public class Fruit {
     public Image getFruitImage() {
         return fruitImage;
     }
+
 }
