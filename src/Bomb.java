@@ -6,7 +6,7 @@ public class Bomb extends Fruit {
 
     public Bomb(Image fruitImage, int fruitNum) {
         super(fruitImage, fruitNum);
-        isBomb = true;
+        //isBomb = true;
     }
 
     //    public Bomb(String fruitType, Image fruitImage) {

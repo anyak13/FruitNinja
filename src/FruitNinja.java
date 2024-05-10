@@ -17,28 +17,37 @@ public class FruitNinja implements ActionListener, MouseListener, MouseMotionLis
     private int numMistakes;
     private int score;
     private FruitNinjaView window;
+    private static final int FRUIT_TYPES = 10;
+    private static final double BOMB_PROBABILITY = 0.2;
+    //private static final int NUM_FRUITS_IN_CYCLE = (int)((Math.random() * 5) + 1);
     public static final int WELCOME = 0;
     public static final int INSTRUCTIONS = 1;
     public static final int STARTING = 2;
     public static final int GAME = 3;
-    public static final int FRUIT_CLICKED = 4;
-    public static final int GAME_OVER = 5;
-    public static final int MADE_MISTAKE = 6;
-    public static final int BOMB_CLICKED = 7;
+    public static final int GAME_OVER = 4;
+    public static final int BOMB_CLICKED = 5;
     private static int state = WELCOME;
     public static final int DELAY_IN_MILLISEC = 20;
-    private static final int SLICED_IMAGE_INDEX = 1;
-    private int count;
+    public boolean sliceActive;
+    public int sliceX;
+    public int sliceY;
     public FruitNinja() {
         this.window = new FruitNinjaView(this);
         gameOver = false;
         score = 0;
         numMistakes = 0;
+        sliceActive = false;
+        fruits = new ArrayList<Fruit>();
+        reloadFruits(false);
 
         //fruits = new Fruit[FRUIT_TYPES];
-        fruits = new ArrayList<Fruit>();
-        int numFruit = (int)((Math.random() * 13) + 1);
-        fruits.add(new Fruit(new ImageIcon("Resources/fruit" + numFruit + ".png").getImage(), numFruit));
+
+        //for (int i = 0; i<NUM_FRUITS_IN_CYCLE; i++) {
+        //    addRandomFruit();
+            //fruits.get(i).setWindow(window);
+        //}
+        //int numFruit = (int)((Math.random() * FRUIT_TYPES) + 1);
+        //fruits.add(new Fruit(new ImageIcon("Resources/fruit" + numFruit + ".png").getImage(), numFruit));
 //        for (int i = 0; i < FRUIT_TYPES; i++) {
 //            fruits[i] = new Fruit(new ImageIcon("Resources/fruit" + (i + 1) + ".png").getImage());
 //        }
@@ -49,10 +58,18 @@ public class FruitNinja implements ActionListener, MouseListener, MouseMotionLis
         this.window.addMouseMotionListener(this);
     }
 
-//    public void createFruits {
+    private void reloadFruits(Boolean withBombs) {
 //        fruits = new Fruit[]
-//    }
-    public void fruitClicked(int mouseX, int mouseY) {
+        int numFruitsInCycle = (int)((Math.random() * 6) + 1);
+        for (int i = 0; i < numFruitsInCycle; i++) {
+            if (withBombs) {
+                addObject();
+            }
+            else addRandomFruit();
+        }
+    }
+  /*  original version for single fruit implemetnation
+  public void checkUserClick(int mouseX, int mouseY) {
         // Update score if a fruit is clicked before going off-screen
         // game over if fruit is a bomb
         // remove fruit from screen
@@ -61,17 +78,18 @@ public class FruitNinja implements ActionListener, MouseListener, MouseMotionLis
 //        System.out.println("current fruit x position: " + fruits.get(0).getX());
         //if (((mouseX - fruits[0].getX() < 100) && (mouseX - fruits[0].getX() >= 0)) || ((fruits[0].getX() - mouseX < 100) && (fruits[0].getX() - mouseX >= 0)))
         //if (fruits.getFirst().equals(bomb))
-        if (mouseX >= fruits.getFirst().getX() && mouseX <= (fruits.getFirst().getX() + fruits.getFirst().getWidth()) && mouseY >= fruits.getFirst().getY() && mouseY <= fruits.getFirst().getY() + fruits.getFirst().getHeight()) {
-            if (!fruits.getFirst().isBomb) {
-                if (!fruits.getFirst().isSliced()) {
+        Fruit currentFruit = fruits.getFirst();
+        // first check to see if mouse click happened within the area of a fruit object
+        if (mouseX >= currentFruit.getX() && mouseX <= (currentFruit.getX() + currentFruit.getWidth()) && mouseY >= currentFruit.getY() && mouseY <= currentFruit.getY() + currentFruit.getHeight()) {
+            // then check if the fruit object was not a bomb
+            if (!currentFruit.isBomb)  {
+                // check to see if the fruit has already been sliced
+                if (!currentFruit.isSliced()) {
+                    // in this case we are slicing a fruit for first time and need to add score and update the image for sliced effect
                     updateScore();
+                    currentFruit.setFruitImage(new ImageIcon("Resources/fruit" + fruits.getFirst().getFruitNum() + "Sliced.png").getImage());
+                    currentFruit.setSliced(true);
                 }
-                //state = FRUIT_CLICKED;
-
-                // update image for sliced effect
-                fruits.getFirst().setFruitImage(new ImageIcon("Resources/fruit" + fruits.getFirst().getFruitNum() +"Sliced.png").getImage());
-                fruits.getFirst().setSliced(true);
-
 
                 //addObject();
                 //fruits.remove(fruits.getFirst());
@@ -85,25 +103,56 @@ public class FruitNinja implements ActionListener, MouseListener, MouseMotionLis
             }
         }
     }
+*/
+  public void checkUserClick(int mouseX, int mouseY) {
+      for (int i = fruits.size() - 1; i >= 0; i--) {
+          Fruit currentFruit = fruits.get(i);
+          // first check to see if mouse click happened within the area of a fruit object
+          if (mouseX >= currentFruit.getX() && mouseX <= (currentFruit.getX() + currentFruit.getWidth()) && mouseY >= currentFruit.getY() && mouseY <= currentFruit.getY() + currentFruit.getHeight()) {
+              // then check if the fruit object was not a bomb
+              //if (!currentFruit.isBomb) {
+              if (!(currentFruit instanceof Bomb)) {
+                  // check to see if the fruit has already been sliced
+                  if (!currentFruit.isSliced()) {
+                      // in this case we are slicing a fruit for first time and need to add score and update the image for sliced effect
+                      updateScore();
+                      currentFruit.setFruitImage(new ImageIcon("Resources/fruit" + currentFruit.getFruitNum() + "Sliced.png").getImage());
+                      currentFruit.setSliced(true);
+                  }
+
+                  //addObject();
+                  //fruits.remove(fruits.getFirst());
+                  window.repaint();
+              }
+              // in this case bomb was clicked
+              else {
+                  state = BOMB_CLICKED;
+                  numMistakes = 0;
+                  window.repaint();
+              }
+          }
+      }
+  }
 
     public void addRandomFruit() {
-        int randomFruitNum = (int)((Math.random() * 13) + 1);
+        int randomFruitNum = (int)((Math.random() * FRUIT_TYPES) + 1);
         fruits.add(new Fruit(new ImageIcon("Resources/fruit" + randomFruitNum + ".png").getImage(), randomFruitNum));
     }
 
     public void addBomb() {
-        fruits.add(new Bomb(new ImageIcon("Resources/bomb.png").getImage(), 0));
+        fruits.add(new Bomb(new ImageIcon("Resources/bomb1.png").getImage(), 0));
     }
 
     public void addObject() {
-        int randomInt = (int)(Math.random() * 6);
-        if (randomInt < 5) {
+        int bombThreshold = (int)(BOMB_PROBABILITY * 100);
+        int randomInt = (int)(Math.random() * 100);
+        if (randomInt >= bombThreshold) {
             addRandomFruit();
             //fruits.add(new Fruit(new ImageIcon("Resources/fruit" + (int)((Math.random() * 13) + 1) + ".png").getImage()));
         }
         else {
             addBomb();
-            //fruits.add(new Fruit(new ImageIcon("Resources/bomb.png").getImage()));
+            //fruits.add(new Fruit(new ImageIcon("Resources/bomb1.png").getImage()));
         }
     }
 
@@ -135,6 +184,9 @@ public class FruitNinja implements ActionListener, MouseListener, MouseMotionLis
         return numMistakes;
     }
 
+    public FruitNinjaView getWindow() {
+        return window;
+    }
     public void setNumMistakes(int numMistakes) {
         this.numMistakes = numMistakes;
     }
@@ -159,31 +211,49 @@ public class FruitNinja implements ActionListener, MouseListener, MouseMotionLis
 //        }
         //System.out.println("about to call move in actionPerformed");
         if (state == GAME) {
-            for (Fruit fruit : fruits) {
-                fruit.move();
+            //for (Fruit fruit : fruits) {
+            for (int i = fruits.size() - 1; i >= 0; i--) {
+
+            //while (!fruits.isEmpty()) {
+                //System.out.println("Size of fruits arraylist is " + fruits.size());
+                //window.repaint();
+                //for (int i = 0; i < fruits.size(); i++) {
+                    Fruit fruit = fruits.get(i);
+                    fruit.move();
 //                checkIfFallen(fruit);
 //                drawNextFruit(fruit);
-                if (fruit.getY() > window.WINDOW_HEIGHT) {
-                    System.out.println("Before " + numMistakes);
-                    if (!(fruit.isBomb || fruit.isSliced())) {
-                        numMistakes++;
-                    }
-                    state = GAME;
-                    //System.out.println(numMistakes);
-                    //System.out.println(fruit.getY());
-                    addObject();
-                    fruits.remove(fruit);
+                    if ((fruit.getY() > window.WINDOW_HEIGHT) && (!fruit.getMovingUp())) {
+                        //System.out.println("Before " + numMistakes);
+                        if (!(fruit instanceof Bomb || fruit.isSliced())) {
+                            numMistakes++;
+                        }
+                        //state = GAME;
+                        //System.out.println(numMistakes);
+                        //System.out.println(fruit.getY());
 
-                    //state = MADE_MISTAKE;
-                    //addRandomFruit();
-                    //addBomb();
-                    state = GAME;
+                        fruits.remove(fruit);
+                        if (fruits.isEmpty()){
+                            reloadFruits(true);
+                            /*addObject();
+                            addObject();
+                            addObject();
+                            addObject();
+                            addObject();*/
+                        }
+
+                        //state = MADE_MISTAKE;
+                        //addRandomFruit();
+                        //addBomb();
+                        //state = GAME;
+                    }
+                    //window.repaint();
                 }
-                window.repaint();
+
             }
-        }
             //window.repaint();
-        checkGameOver();
+            checkGameOver();
+            window.repaint();
+
             //fruits.get(0).move();
 //            if (fruits.get(0).getY() > 800) {
 //                numMistakes++;
@@ -218,6 +288,9 @@ public class FruitNinja implements ActionListener, MouseListener, MouseMotionLis
         if (numMistakes == 3) {
             setGameOver(true);
         }
+        if (state == BOMB_CLICKED) {
+            setGameOver(true);
+        }
     }
 
     @Override
@@ -234,11 +307,11 @@ public class FruitNinja implements ActionListener, MouseListener, MouseMotionLis
             setState(STARTING);
             //window.repaint();
         }
-        else if (state == STARTING) {
-            //System.out.println("in starting state");
-            setState(GAME);
-            //repaint();
-        }
+//        else if (state == STARTING) {
+//            //System.out.println("in starting state");
+//            setState(GAME);
+//            //repaint();
+//        }
 //        else if (state == GAME) {
 //            //if(fruitImages.get(0).getX()) {
 //            //setState(FRUIT_CLICKED);
@@ -258,7 +331,7 @@ public class FruitNinja implements ActionListener, MouseListener, MouseMotionLis
 
     @Override
     public void mouseReleased(MouseEvent mouseEvent) {
-
+        sliceActive = false;
     }
 
     @Override
@@ -278,9 +351,13 @@ public class FruitNinja implements ActionListener, MouseListener, MouseMotionLis
             //setState(FRUIT_CLICKED);
             int xClicked = e.getX();
             int yClicked = e.getY();
-            System.out.println(xClicked);
-            fruitClicked(xClicked, yClicked);
-            //repaint();
+            //System.out.println(xClicked);
+            checkUserClick(xClicked, yClicked);
+            System.out.println("x:" + xClicked + ", y:" + yClicked);
+            sliceActive = true;
+            sliceX = xClicked;
+            sliceY = yClicked;
+            window.repaint();
         }
     }
 

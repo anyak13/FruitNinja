@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 // Anya Kothari
 // 4/20/24
@@ -24,6 +25,8 @@ public class FruitNinjaView extends JFrame {
     private static final int X_Y_Value = 50;
     private static final int X_WIDTH = 60;
     private static final int X_HEIGHT = 65;
+    private static final int RED_X_WIDTH = 65;
+    private static final int RED_X_HEIGHT = 70;
 
 
     public FruitNinjaView(FruitNinja game) {
@@ -56,7 +59,11 @@ public class FruitNinjaView extends JFrame {
             drawInstructionScreen(g);
         }
         else if (game.getState() == game.STARTING) {
-            drawStartGameScreen(g);
+            try {
+                drawStartGameScreen(g);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
         else if (game.getState() == game.GAME) {
             drawGameScreen(g);
@@ -65,9 +72,13 @@ public class FruitNinjaView extends JFrame {
             drawGameOverScreen(g);
         }
         else if (game.getState() == game.BOMB_CLICKED) {
-            drawBombScreen(g);
+            try {
+                drawBombScreen(g);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
-        showMistake(g);
+        //showMistake(g);
     }
 
     public void drawWelcomeScreen(Graphics g) {
@@ -78,18 +89,30 @@ public class FruitNinjaView extends JFrame {
     }
     public void drawGameScreen(Graphics g) {
         g.drawImage(playBG, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, this);
-        int numX = 3;
+        showMistake(g);
+        /*int numX = 3;
         for (int i = 0; i < numX; i ++) {
-            g.drawImage(x, X_START_X_VALUE + (DISTANCE_BETWEEN_X * i), X_Y_Value, X_WIDTH, X_HEIGHT, this);
-        }
+            if (game.getNumMistakes() - 1 >= i) {
+                g.drawImage(redX, X_START_X_VALUE + (DISTANCE_BETWEEN_X * i), X_Y_Value, X_WIDTH, X_HEIGHT, this);
+            }
+            else g.drawImage(x, X_START_X_VALUE + (DISTANCE_BETWEEN_X * i), X_Y_Value, X_WIDTH, X_HEIGHT, this);
+        }*/
         g.setFont(new Font("Serif", Font.BOLD, 40));
         g.setColor(Color.white);
         g.drawString("" + game.getScore(), 160, 95);
         drawFruits(g);
+        if (game.sliceActive) {
+            //g.drawLine(game.sliceX, game.sliceY, game.sliceX, game.sliceY);
+            g.fillRect(game.sliceX - 3, game.sliceY - 3, 6, 6);
+        }
     }
 
     public void drawFruits(Graphics g) {
-        game.getFruits().getFirst().draw(g);
+        for (int i = 0; i < game.getFruits().size();i++)
+        {
+            //game.getFruits().getFirst().draw(g);
+            game.getFruits().get(i).draw(g);
+        }
     }
 
     public void drawGameOverScreen(Graphics g) {
@@ -97,30 +120,45 @@ public class FruitNinjaView extends JFrame {
         g.setFont(new Font("Serif", Font.BOLD, 50));
         g.setColor(Color.white);
         g.drawString("" + game.getScore(), 310, 460);
+        showMistake(g);
     }
-    public void drawStartGameScreen(Graphics g) {
+    public void drawStartGameScreen(Graphics g) throws InterruptedException {
         g.drawImage(readyBG, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, this);
-        ///wait(00);
-        //Thread.sleep(100);
+        TimeUnit.SECONDS.sleep(2);
         g.drawImage(goBG, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, this);
-        //wait(500);
-        //drawGameScreen(g);
+        TimeUnit.SECONDS.sleep(2);
+        game.setState(game.GAME);
     }
 
     public void showMistake(Graphics g) {
-        if (game.getNumMistakes() >= 1) {
-            g.drawImage(redX, X_START_X_VALUE - 2, X_Y_Value + 1, X_WIDTH, X_HEIGHT,this);
+        /*if (game.getNumMistakes() >= 1) {
+            g.drawImage(redX, X_START_X_VALUE - 2, X_Y_Value + 1, RED_X_WIDTH, RED_X_HEIGHT,this);
         }
         if (game.getNumMistakes() >= 2) {
-            g.drawImage(redX, X_START_X_VALUE + DISTANCE_BETWEEN_X, X_Y_Value, X_WIDTH, X_HEIGHT,this);
+            g.drawImage(redX, X_START_X_VALUE + DISTANCE_BETWEEN_X, X_Y_Value, RED_X_WIDTH, RED_X_HEIGHT,this);
         }
         if (game.getNumMistakes() >= 3) {
-            g.drawImage(redX, X_START_X_VALUE + (DISTANCE_BETWEEN_X * 2), X_Y_Value, X_WIDTH, X_HEIGHT,this);
+            g.drawImage(redX, X_START_X_VALUE + (DISTANCE_BETWEEN_X * 2), X_Y_Value, RED_X_WIDTH, RED_X_HEIGHT,this);
+        }*/
+
+        int numX = 3;
+        for (int i = 0; i < numX; i ++) {
+            if (game.getNumMistakes() - 1 >= i) {
+                g.drawImage(redX, X_START_X_VALUE + (DISTANCE_BETWEEN_X * i), X_Y_Value, X_WIDTH, X_HEIGHT, this);
+            }
+            else g.drawImage(x, X_START_X_VALUE + (DISTANCE_BETWEEN_X * i), X_Y_Value, X_WIDTH, X_HEIGHT, this);
         }
     }
 
-    public void drawBombScreen(Graphics g) {
+    public void drawBombScreen(Graphics g) throws InterruptedException {
         g.drawImage(bombBG, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, this);
+        //TimeUnit.SECONDS.sleep(1);
+        TimeUnit.MILLISECONDS.sleep(400);
+        drawGameScreen(g);
+        TimeUnit.MILLISECONDS.sleep(200);
+        g.drawImage(bombBG, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, this);
+        TimeUnit.MILLISECONDS.sleep(400);
+        drawGameOverScreen(g);
     }
 
     public void drawSplat(Graphics g) {

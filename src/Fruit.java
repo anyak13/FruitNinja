@@ -21,9 +21,10 @@ public class Fruit {
     private boolean movingRight;
     private FruitNinjaView window;
     private static final int STARTING_Y = 800;
-    private static final int DX_DY = 8;
+    private static final int DY = 6;
+    private static final int DX = 1;
 
-    protected boolean isBomb;
+    private boolean isBomb;
 
 //    public Fruit(Image fruitImage, int width, int height, int x, int y, int dx, int dy, int flyHeight) {
 ////        x = (int)(Math.random() * 600);
@@ -49,19 +50,21 @@ public class Fruit {
 //    }
 
     public Fruit(Image fruitImage, int fruitNum) {
-        x = (int)(Math.random() * 400) + 100;
-        y = STARTING_Y;
+        //x = (int)(Math.random() * 400) + 100;
+        x = (int)(Math.random() * FruitNinjaView.WINDOW_WIDTH);
+        y = STARTING_Y + (int)(Math.random() * 100);
         flyHeight = (int)((Math.random() * 200) + 100);
         this.fruitImage = fruitImage;
         this.width = FRUIT_WIDTH; //fruitImage.getWidth(null);
         this.height = FRUIT_HEIGHT; //fruitImage.getHeight(null);
-        dx = DX_DY / 6;
-        dy = DX_DY;
+        dx = DX;//DX_DY / 6;
+        dy = DY;//DX_DY;
         movingUp = true;
-        if (x < 300) movingRight = true;
+        if (x < (FruitNinjaView.WINDOW_WIDTH / 2)) movingRight = true;
         else movingRight = false;
         isBomb = false;
         this.fruitNum = fruitNum;
+
         //fruitNum = (int)((Math.random() * 13) + 1);
         //this(fruitType, fruitImage, (int)(Math.random() * 500), STARTING_Y, 6, 6, (int)((Math.random() * 200) + 100), true);
     }
@@ -73,7 +76,9 @@ public class Fruit {
     public int getY() {
         return y;
     }
-
+    public boolean getMovingUp() {
+        return movingUp;
+    }
     public int getFlyHeight() {
         return flyHeight;
     }
@@ -120,6 +125,7 @@ public class Fruit {
     {
         isSliced = sliced;
         movingUp=false;
+        dy *= 2;
     }
 
     public void setWindow(FruitNinjaView window) {
