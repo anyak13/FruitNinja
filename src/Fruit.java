@@ -1,74 +1,50 @@
-// Anya Kothari
-// 4/20/24
 import java.awt.*;
 
+// Anya Kothari
+// 4/20/24
 public class Fruit {
-    //private String fruitType;
+    private FruitNinjaView window;
     private int x;
     private int y;
     private int dx;
     private int dy;
-    private int width;
-    private int height;
     private int flyHeight;
     private int fruitNum;
-    //private static final int startingY = -15;
     public static final int FRUIT_WIDTH = 200;
     public static final int FRUIT_HEIGHT = 190;
     private Image fruitImage;
     private boolean isSliced;
     private boolean movingUp;
     private boolean movingRight;
-    private FruitNinjaView window;
     private static final int STARTING_Y = 800;
     private static final int DY = 6;
     private static final int DX = 1;
-
     private boolean isBomb;
 
-//    public Fruit(Image fruitImage, int width, int height, int x, int y, int dx, int dy, int flyHeight) {
-////        x = (int)(Math.random() * 600);
-////        flyHeight = (int)(Math.random() * 800);
-//////        this.dx = dx;
-//////        this.dy = dy;
-////        this.fruitType = fruitType;
-////        this.fruitImage = fruitImage;
-//        this.fruitType = fruitType;
-//        this.fruitImage = fruitImage;
-//        this.x = x;
-//        this.y = y;
-//        this.width = width;
-//        this.height = height;
-//        this.dx= dx;
-//        this.dy = dy;
-//        //this.width = width;
-////        this.width = fruitImage.getWidth();
-////        this.height = fruitImage.getHeight();
-//        //this.height = height;
-//        this.flyHeight = flyHeight;
-//        this.movingUp = movingUp;
-//    }
-
-    public Fruit(Image fruitImage, int fruitNum) {
-        //x = (int)(Math.random() * 400) + 100;
+    // Constructor that takes in the fruits image, it's number, and whether it's a bomb
+    public Fruit(Image fruitImage, int fruitNum, boolean isBomb) {
+        // Give the new fruit a random x value
         x = (int)(Math.random() * FruitNinjaView.WINDOW_WIDTH);
+        // Give each fruit a different starting y value so they appear on the screen at different times
         y = STARTING_Y + (int)(Math.random() * 100);
+        // Create a random fly height
         flyHeight = (int)((Math.random() * 200) + 100);
         this.fruitImage = fruitImage;
-        this.width = FRUIT_WIDTH; //fruitImage.getWidth(null);
-        this.height = FRUIT_HEIGHT; //fruitImage.getHeight(null);
-        dx = DX;//DX_DY / 6;
-        dy = DY;//DX_DY;
+        this.dx = DX;
+        this.dy = DY;
         movingUp = true;
-        if (x < (FruitNinjaView.WINDOW_WIDTH / 2)) movingRight = true;
-        else movingRight = false;
-        isBomb = false;
+        // Move right if the x coordinate is on the left side of the window
+        if (x < (FruitNinjaView.WINDOW_WIDTH / 2)) {
+            movingRight = true;
+        }
+        else {
+            movingRight = false;
+        }
+        this.isBomb = isBomb;
         this.fruitNum = fruitNum;
-
-        //fruitNum = (int)((Math.random() * 13) + 1);
-        //this(fruitType, fruitImage, (int)(Math.random() * 500), STARTING_Y, 6, 6, (int)((Math.random() * 200) + 100), true);
     }
 
+    // Getter and setter methods
     public int getX() {
         return x;
     }
@@ -79,73 +55,36 @@ public class Fruit {
     public boolean getMovingUp() {
         return movingUp;
     }
-    public int getFlyHeight() {
-        return flyHeight;
-    }
-
-    public boolean isSliced() {
-        return isSliced;
-    }
-    public int getWidth() {
-        return width;
-    }
-    public int getHeight() {
-        return height;
-    }
 
     public int getFruitNum() {
         return fruitNum;
-    }
-
-    public void setFruitNum(int fruitNum) {
-        this.fruitNum = fruitNum;
-    }
-
-    private void setBombStatus(boolean isBomb)
-    {
-        this.isBomb = isBomb;
-    }
-    public FruitNinjaView getWindow() {
-        return window;
-    }
-
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    public void setFlyHeight(int flyHeight) {
-        this.flyHeight = flyHeight;
     }
 
     public void setFruitImage(Image fruitImage) {
         this.fruitImage = fruitImage;
     }
 
-    public void setSliced(boolean sliced)
-    {
+    public boolean isSliced() {
+        return isSliced;
+    }
+
+    public void setSliced(boolean sliced) {
         isSliced = sliced;
         movingUp=false;
         dy *= 2;
     }
-
-    public void setWindow(FruitNinjaView window) {
-        this.window = window;
+    public boolean isBomb() {
+        return isBomb;
     }
 
+    // Draw the fruit at its x and y location
     public void draw(Graphics g) {
-        g.drawImage(fruitImage, x, y, getWidth(), getHeight(), window);
+        g.drawImage(fruitImage, x, y, FRUIT_WIDTH, FRUIT_HEIGHT, window);
     }
 
+    // Method to get each fruit to move up, go back down, and move a little to the right
     public void move() {
-        //x += dx;
-        /*while (y != flyHeight) {
-            y -= dy;
-        }
-        y += dy;*/
-        //y -= dy;
-        //System.out.println("flyHeight position is: " + flyHeight);
-        //System.out.println("current y  position is: " + y);
-        //System.out.println("current x position is: " + x);
+        // Decrease the y value of the fruit if it is moving up
         if (movingUp)
         {
             y -= dy;
@@ -153,32 +92,16 @@ public class Fruit {
                 movingUp = false;
             }
         }
+        // Increase y value when moving down
         else {
             y += dy;
         }
-        if (movingRight)
-        {
+        // Increase x when going right
+        if (movingRight) {
             x += dx;
-            //if (y <= flyHeight) movingUp = false;
         }
         else {
             x -= dx;
         }
-        //x-=dx;
-        /*
-        if (y >= flyHeight) {
-            y -= dy;
-        }
-        else if (y < flyHeight) {
-            y += dy;
-        }
-        */
-
-        //else y += dy;
     }
-
-    public Image getFruitImage() {
-        return fruitImage;
-    }
-
 }

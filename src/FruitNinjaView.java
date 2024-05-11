@@ -1,7 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
-import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 // Anya Kothari
@@ -19,20 +17,17 @@ public class FruitNinjaView extends JFrame {
     private Image x;
     private Image redX;
     private Image bombBG;
-    private Image splat;
     private static final int DISTANCE_BETWEEN_X = 60;
     private static final int X_START_X_VALUE = 400;
     private static final int X_Y_Value = 50;
     private static final int X_WIDTH = 60;
     private static final int X_HEIGHT = 65;
-    private static final int RED_X_WIDTH = 65;
-    private static final int RED_X_HEIGHT = 70;
 
 
     public FruitNinjaView(FruitNinja game) {
         this.game = game;
 
-        // Initialize background images
+        // Initialize images
         startBG = new ImageIcon("Resources/startBG.png").getImage();
         instructions = new ImageIcon("Resources/instructionBG.png").getImage();
         gameOverBG = new ImageIcon("Resources/gameOverBG.png").getImage();
@@ -42,7 +37,6 @@ public class FruitNinjaView extends JFrame {
         x = new ImageIcon("Resources/X.png").getImage();
         redX = new ImageIcon("Resources/redX.png").getImage();
         bombBG = new ImageIcon("Resources/bombBG.jpg").getImage();
-        splat = new ImageIcon("Resources/splat1.png").getImage();
 
         // Set up the window
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -51,6 +45,7 @@ public class FruitNinjaView extends JFrame {
         this.setVisible(true);
     }
 
+    // Method to control the screen based off of current state of game
     public void paint(Graphics g) {
         if (game.getState() == game.WELCOME) {
             drawWelcomeScreen(g);
@@ -59,6 +54,7 @@ public class FruitNinjaView extends JFrame {
             drawInstructionScreen(g);
         }
         else if (game.getState() == game.STARTING) {
+            // Allow for pause
             try {
                 drawStartGameScreen(g);
             } catch (InterruptedException e) {
@@ -72,49 +68,46 @@ public class FruitNinjaView extends JFrame {
             drawGameOverScreen(g);
         }
         else if (game.getState() == game.BOMB_CLICKED) {
+            // Allow for pause
             try {
                 drawBombScreen(g);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
         }
-        //showMistake(g);
     }
 
+    // Draw the welcome screen
     public void drawWelcomeScreen(Graphics g) {
         g.drawImage(startBG, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, this);
     }
+
+    // Draw the instructions
     public void drawInstructionScreen(Graphics g) {
         g.drawImage(instructions, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, this);
     }
     public void drawGameScreen(Graphics g) {
         g.drawImage(playBG, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, this);
         showMistake(g);
-        /*int numX = 3;
-        for (int i = 0; i < numX; i ++) {
-            if (game.getNumMistakes() - 1 >= i) {
-                g.drawImage(redX, X_START_X_VALUE + (DISTANCE_BETWEEN_X * i), X_Y_Value, X_WIDTH, X_HEIGHT, this);
-            }
-            else g.drawImage(x, X_START_X_VALUE + (DISTANCE_BETWEEN_X * i), X_Y_Value, X_WIDTH, X_HEIGHT, this);
-        }*/
         g.setFont(new Font("Serif", Font.BOLD, 40));
         g.setColor(Color.white);
         g.drawString("" + game.getScore(), 160, 95);
+        // Draw the fruits
         drawFruits(g);
-        if (game.sliceActive) {
-            //g.drawLine(game.sliceX, game.sliceY, game.sliceX, game.sliceY);
-            g.fillRect(game.sliceX - 3, game.sliceY - 3, 6, 6);
+        // Draw rectangle to show the location of slice
+        if (game.isSliceActive()) {
+            g.fillRect(game.getSliceX() - 3, game.getSliceY() - 3, 6, 6);
         }
     }
 
+    // Draw fruits in the fruit ArrayList
     public void drawFruits(Graphics g) {
-        for (int i = 0; i < game.getFruits().size();i++)
-        {
-            //game.getFruits().getFirst().draw(g);
+        for (int i = 0; i < game.getFruits().size();i++) {
             game.getFruits().get(i).draw(g);
         }
     }
 
+    // Draw the screen to show that the game is over
     public void drawGameOverScreen(Graphics g) {
         g.drawImage(gameOverBG, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, this);
         g.setFont(new Font("Serif", Font.BOLD, 50));
@@ -122,25 +115,19 @@ public class FruitNinjaView extends JFrame {
         g.drawString("" + game.getScore(), 310, 460);
         showMistake(g);
     }
+
+    // Draw ready and go images and put a pause in between
     public void drawStartGameScreen(Graphics g) throws InterruptedException {
+        int pauseTime = 2;
         g.drawImage(readyBG, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, this);
-        TimeUnit.SECONDS.sleep(2);
+        TimeUnit.SECONDS.sleep(pauseTime);
         g.drawImage(goBG, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, this);
-        TimeUnit.SECONDS.sleep(2);
+        TimeUnit.SECONDS.sleep(pauseTime);
         game.setState(game.GAME);
     }
 
+    // Draw the X's based on the number of mistakes
     public void showMistake(Graphics g) {
-        /*if (game.getNumMistakes() >= 1) {
-            g.drawImage(redX, X_START_X_VALUE - 2, X_Y_Value + 1, RED_X_WIDTH, RED_X_HEIGHT,this);
-        }
-        if (game.getNumMistakes() >= 2) {
-            g.drawImage(redX, X_START_X_VALUE + DISTANCE_BETWEEN_X, X_Y_Value, RED_X_WIDTH, RED_X_HEIGHT,this);
-        }
-        if (game.getNumMistakes() >= 3) {
-            g.drawImage(redX, X_START_X_VALUE + (DISTANCE_BETWEEN_X * 2), X_Y_Value, RED_X_WIDTH, RED_X_HEIGHT,this);
-        }*/
-
         int numX = 3;
         for (int i = 0; i < numX; i ++) {
             if (game.getNumMistakes() - 1 >= i) {
@@ -151,17 +138,14 @@ public class FruitNinjaView extends JFrame {
     }
 
     public void drawBombScreen(Graphics g) throws InterruptedException {
-        g.drawImage(bombBG, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, this);
-        //TimeUnit.SECONDS.sleep(1);
-        TimeUnit.MILLISECONDS.sleep(400);
+        // Create flash when bomb is clicked
+        int flashTime = 400;
+        g.drawImage(bombBG, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, this);;
+        TimeUnit.MILLISECONDS.sleep(flashTime);
         drawGameScreen(g);
-        TimeUnit.MILLISECONDS.sleep(200);
+        TimeUnit.MILLISECONDS.sleep(flashTime / 2);
         g.drawImage(bombBG, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, this);
-        TimeUnit.MILLISECONDS.sleep(400);
+        TimeUnit.MILLISECONDS.sleep(flashTime);
         drawGameOverScreen(g);
-    }
-
-    public void drawSplat(Graphics g) {
-        g.drawImage(splat, 50, 50, 50, 50, this);
     }
 }
