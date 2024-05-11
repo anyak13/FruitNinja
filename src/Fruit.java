@@ -27,13 +27,13 @@ public class Fruit {
         x = (int)(Math.random() * FruitNinjaView.WINDOW_WIDTH);
         // Give each fruit a different starting y value so they appear on the screen at different times
         y = STARTING_Y + (int)(Math.random() * 100);
-        // Create a random fly height
+        // Create a random max fly height for each fruit
         flyHeight = (int)((Math.random() * 200) + 100);
         this.fruitImage = fruitImage;
         this.dx = DX;
         this.dy = DY;
         movingUp = true;
-        // Move right if the x coordinate is on the left side of the window
+        // Move right if the starting x coordinate is on the left half of the window
         if (x < (FruitNinjaView.WINDOW_WIDTH / 2)) {
             movingRight = true;
         }
@@ -70,6 +70,7 @@ public class Fruit {
 
     public void setSliced(boolean sliced) {
         isSliced = sliced;
+        // once a fruit is sliced, it should go down and faster
         movingUp=false;
         dy *= 2;
     }
@@ -82,7 +83,7 @@ public class Fruit {
         g.drawImage(fruitImage, x, y, FRUIT_WIDTH, FRUIT_HEIGHT, window);
     }
 
-    // Method to get each fruit to move up, go back down, and move a little to the right
+    // Method to get each fruit to move vertically and horizontally
     public void move() {
         // Decrease the y value of the fruit if it is moving up
         if (movingUp)
@@ -96,7 +97,7 @@ public class Fruit {
         else {
             y += dy;
         }
-        // Increase x when going right
+        // Increase x when going right and decrease x when going left
         if (movingRight) {
             x += dx;
         }

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 // Anya Kothari
 // 4/20/24
+// Created the game Fruit Ninja where the user slices fruits that are thrown up into the air
 public class FruitNinja implements ActionListener, MouseListener, MouseMotionListener {
     private ArrayList<Fruit> fruits;
     private FruitNinjaView window;
@@ -35,7 +36,8 @@ public class FruitNinja implements ActionListener, MouseListener, MouseMotionLis
         numMistakes = 0;
         sliceActive = false;
         fruits = new ArrayList<Fruit>();
-        //
+
+        // Load fruits for initial cycle with no bombs to start
         reloadFruits(false);
 
         // Create clock for ActionPerformed method
@@ -88,6 +90,7 @@ public class FruitNinja implements ActionListener, MouseListener, MouseMotionLis
     }
 
 
+    // Method to create a random number of fruits per cycle
     private void reloadFruits(Boolean withBombs) {
         int numFruitsInCycle = (int)((Math.random() * MAX_FRUIT_IN_CYCLE) + 1);
         for (int i = 0; i < numFruitsInCycle; i++) {
@@ -98,8 +101,9 @@ public class FruitNinja implements ActionListener, MouseListener, MouseMotionLis
         }
     }
 
-    // Check the click's location
+    // Check the click's location to determine if an object was touched
     public void checkClick(int mouseX, int mouseY) {
+      // iterate through the fruits list to check for contact with the click
       for (int i = fruits.size() - 1; i >= 0; i--) {
           Fruit currentFruit = fruits.get(i);
           // Check if the mouse click happened within the area of a fruit object
@@ -124,7 +128,7 @@ public class FruitNinja implements ActionListener, MouseListener, MouseMotionLis
       }
     }
 
-    // Create a new fruit to add to the ArrayList
+    // Create a new fruit of random type to add to the ArrayList
     public void addRandomFruit() {
         int randomFruitNum = (int)((Math.random() * FRUIT_TYPES) + 1);
         fruits.add(new Fruit(new ImageIcon("Resources/fruit" + randomFruitNum + ".png").getImage(), randomFruitNum, false));
@@ -135,7 +139,7 @@ public class FruitNinja implements ActionListener, MouseListener, MouseMotionLis
         fruits.add(new Fruit(new ImageIcon("Resources/bomb.png").getImage(), 0, true));
     }
 
-    // Add either a bomb or fruit to the ArrayList
+    // Add either a bomb or fruit (based on bomb probability constant) to the ArrayList
     public void addObject() {
         int bombThreshold = (int)(BOMB_PROBABILITY * 100);
         int randomInt = (int)(Math.random() * 100);
@@ -163,7 +167,7 @@ public class FruitNinja implements ActionListener, MouseListener, MouseMotionLis
                         numMistakes++;
                     }
                     fruits.remove(fruit);
-                    // Add more fruits to ArrayList
+                    // Add more objects to ArrayList
                     if (fruits.isEmpty()) {
                         reloadFruits(true);
                     }
@@ -208,9 +212,11 @@ public class FruitNinja implements ActionListener, MouseListener, MouseMotionLis
             int yClicked = e.getY();
             // Check the click by taking in x and y coordinates of drag
             checkClick(xClicked, yClicked);
+            // Use these parameters to display location of slice on game screen
             sliceActive = true;
             sliceX = xClicked;
             sliceY = yClicked;
+
             window.repaint();
         }
     }
